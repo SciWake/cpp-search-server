@@ -50,6 +50,11 @@ set<string> ParseStopWords(const string& text) {
     return stop_words;
 }
 
+struct DocumentContent {
+    int id = 0;
+    vector<string> words;
+};
+
 vector<string> SplitIntoWordsNoStop(const string& text, const set<string>& stop_words) {
     vector<string> words;
     for (const string& word : SplitIntoWords(text)) {
@@ -60,10 +65,10 @@ vector<string> SplitIntoWordsNoStop(const string& text, const set<string>& stop_
     return words;
 }
 
-void AddDocument(vector<pair<int, vector<string>>>& documents, const set<string>& stop_words,
-                 int document_id, const string& document) {
+void AddDocument(vector<DocumentContent>& documents, const set<string>& stop_words, int document_id,
+                 const string& document) {
     const vector<string> words = SplitIntoWordsNoStop(document, stop_words);
-    documents.push_back(pair<int, vector<string>>{document_id, words});
+    documents.push_back({document_id, words});
 }
 
 set<string> ParseQuery(const string& text, const set<string>& stop_words) {
@@ -74,12 +79,12 @@ set<string> ParseQuery(const string& text, const set<string>& stop_words) {
     return query_words;
 }
 
-int MatchDocument(const pair<int, vector<string>>& content, const set<string>& query_words) {
+int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
     if (query_words.empty()) {
         return 0;
     }
     set<string> matched_words;
-    for (const string& word : content.second) {
+    for (const string& word : content.words) {
         if (matched_words.count(word) != 0) {
             continue;
         }
@@ -91,36 +96,29 @@ int MatchDocument(const pair<int, vector<string>>& content, const set<string>& q
 }
 
 // Для каждого документа возвращает его релевантность и id
-vector<pair<int, int>> FindAllDocuments(const vector<pair<int, vector<string>>>& documents,
+vector<pair<int, int>> FindAllDocuments(const vector<DocumentContent>& documents,
                                         const set<string>& query_words) {
     vector<pair<int, int>> matched_documents;
     for (const auto& document : documents) {
         const int relevance = MatchDocument(document, query_words);
         if (relevance > 0) {
-            matched_documents.push_back({relevance, document.first});
+            matched_documents.push_back({relevance, document.id});
         }
     }
     return matched_documents;
 }
 
 // Возвращает топ-5 самых релевантных документов в виде пар: {id, релевантность}
-vector<pair<int, int>> FindTopDocuments(const vector<pair<int, vector<string>>>& documents,
+vector<pair<int, int>> FindTopDocuments(const vector<DocumentContent>& documents,
                                         const set<string>& stop_words, const string& raw_query) {
     const set<string> query_words = ParseQuery(raw_query, stop_words);
     auto matched_documents = FindAllDocuments(documents, query_words);
 
-    // Сортируем документы по возрастанию релевантности и id
     sort(matched_documents.begin(), matched_documents.end());
-    // Меняем порядок следования документов, чтобы вначале оказались самые релевантные
     reverse(matched_documents.begin(), matched_documents.end());
-
-    // Оставляем MAX_RESULT_DOCUMENT_COUNT самых релевантных документов
     if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
         matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
     }
-    // Массив matched_documents содержит пары {релевантность, id}
-    // FindTopDocuments должна вернуть пары {id, релевантность}
-    // Поэтому нужно обменять элементы пар, перед тем как вернуть результат
     for (auto& matched_document : matched_documents) {
         swap(matched_document.first, matched_document.second);
     }
@@ -132,7 +130,7 @@ int main() {
     const set<string> stop_words = ParseStopWords(stop_words_joined);
 
     // Read documents
-    vector<pair<int, vector<string>>> documents;
+    vector<DocumentContent> documents;
     const int document_count = ReadLineWithNumber();
     for (int document_id = 0; document_id < document_count; ++document_id) {
         AddDocument(documents, stop_words, document_id, ReadLine());
