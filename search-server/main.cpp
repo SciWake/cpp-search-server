@@ -7,7 +7,9 @@
 
 using namespace std;
 
+/*
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
+*/
 
 string ReadLine() {
     string s;
@@ -42,19 +44,7 @@ vector<string> SplitIntoWords(const string& text) {
     return words;
 }
 
-set<string> ParseStopWords(const string& text) {
-    set<string> stop_words;
-    for (const string& word : SplitIntoWords(text)) {
-        stop_words.insert(word);
-    }
-    return stop_words;
-}
-
-struct DocumentContent {
-    int id = 0;
-    vector<string> words;
-};
-
+/*
 struct Document {
     int id;
     int relevance;
@@ -62,22 +52,6 @@ struct Document {
 
 bool HasDocumentGreaterRelevance(const Document& lhs, const Document& rhs) {
     return lhs.relevance > rhs.relevance;
-}
-
-vector<string> SplitIntoWordsNoStop(const string& text, const set<string>& stop_words) {
-    vector<string> words;
-    for (const string& word : SplitIntoWords(text)) {
-        if (stop_words.count(word) == 0) {
-            words.push_back(word);
-        }
-    }
-    return words;
-}
-
-void AddDocument(vector<DocumentContent>& documents, const set<string>& stop_words, int document_id,
-                 const string& document) {
-    const vector<string> words = SplitIntoWordsNoStop(document, stop_words);
-    documents.push_back({document_id, words});
 }
 
 set<string> ParseQuery(const string& text, const set<string>& stop_words) {
@@ -127,50 +101,50 @@ vector<Document> FindTopDocuments(const vector<DocumentContent>& documents,
     }
     return matched_documents;
 }
+*/
 
 class SearchServer {
 public:
-    void AddDocument(int document_id, const string& document) {
-        const vector<string> words = SplitIntoWordsNoStop(document);
-        documents_.push_back({document_id, words});
-    }
-    
     void SetStopWords(const string& text) {
         for (const string& word : SplitIntoWords(text)) {
             stop_words_.insert(word);
         }
     }
+
+    void AddDocument(int document_id, const string& document) {
+        const vector<string> words = SplitIntoWordsNoStop(document);
+        documents_.push_back({document_id, words});
+    }
+
 private:
     struct DocumentContent {
         int id = 0;
         vector<string> words;
     };
-    
+
     vector<DocumentContent> documents_;
+
     set<string> stop_words_;
-    
+
+    bool IsStopWord(const string& word) {
+        return stop_words_.count(word) > 0;
+    }
+
     vector<string> SplitIntoWordsNoStop(const string& text) {
         vector<string> words;
         for (const string& word : SplitIntoWords(text)) {
-            if (stop_words_.count(word) == 0) {
+            if (!IsStopWord(word)) {
                 words.push_back(word);
             }
         }
         return words;
     }
-
 };
 
-int main() {
-    const string stop_words_joined = ReadLine();
-    const set<string> stop_words = ParseStopWords(stop_words_joined);
 
-    // Read documents
-    vector<DocumentContent> documents;
-    const int document_count = ReadLineWithNumber();
-    for (int document_id = 0; document_id < document_count; ++document_id) {
-        AddDocument(documents, stop_words, document_id, ReadLine());
-    }
+/*
+int main() {
+    // ...
 
     const string query = ReadLine();
     for (auto [document_id, relevance] : FindTopDocuments(documents, stop_words, query)) {
@@ -178,3 +152,4 @@ int main() {
              << endl;
     }
 }
+*/
