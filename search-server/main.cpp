@@ -7,9 +7,7 @@
 
 using namespace std;
 
-
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
-
 
 string ReadLine() {
     string s;
@@ -44,7 +42,6 @@ vector<string> SplitIntoWords(const string& text) {
     return words;
 }
 
-
 struct Document {
     int id;
     int relevance;
@@ -53,7 +50,6 @@ struct Document {
 bool HasDocumentGreaterRelevance(const Document& lhs, const Document& rhs) {
     return lhs.relevance > rhs.relevance;
 }
-
 
 class SearchServer {
 public:
@@ -69,7 +65,8 @@ public:
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) {
-        auto matched_documents = FindAllDocuments(ParseQuery(raw_query));
+        const set<string> query_words = ParseQuery(raw_query);
+        auto matched_documents = FindAllDocuments(query_words);
 
         sort(matched_documents.begin(), matched_documents.end(), HasDocumentGreaterRelevance);
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
@@ -102,6 +99,25 @@ private:
         return words;
     }
 
+    set<string> ParseQuery(const string& text) {
+        set<string> query_words;
+        for (const string& word : SplitIntoWordsNoStop(text)) {
+            query_words.insert(word);
+        }
+        return query_words;
+    }
+
+    vector<Document> FindAllDocuments(const set<string>& query_words) {
+        vector<Document> matched_documents;
+        for (const auto& document : documents_) {
+            const int relevance = MatchDocument(document, query_words);
+            if (relevance > 0) {
+                matched_documents.push_back({document.id, relevance});
+            }
+        }
+        return matched_documents;
+    }
+
     static int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
         if (query_words.empty()) {
             return 0;
@@ -116,25 +132,6 @@ private:
             }
         }
         return static_cast<int>(matched_words.size());
-    }
-
-    vector<Document> FindAllDocuments(const set<string>& query_words) {
-        vector<Document> matched_documents;
-        for (const auto& document : documents_) {
-            const int relevance = MatchDocument(document, query_words);
-            if (relevance > 0) {
-                matched_documents.push_back({document.id, relevance});
-            }
-        }
-        return matched_documents;
-    }
-
-    set<string> ParseQuery(const string& text) {
-        set<string> query_words;
-        for (const string& word : SplitIntoWordsNoStop(text)) {
-            query_words.insert(word);
-        }
-        return query_words;
     }
 };
 
@@ -152,9 +149,10 @@ SearchServer CreateSearchServer() {
 
 int main() {
     SearchServer search_server = CreateSearchServer();
+
     const string query = ReadLine();
-    for (auto [document_id, relevance] : search_server.FindTopDocuments(query)) {
-        cout << "{ document_id = "s << document_id << ", relevance = "s << relevance << " }"s
-             << endl;
+    for (const auto& [document_id, relevance] : search_server.FindTopDocuments(query)) {
+        cout << "{ document_id = "s << document_id << ", "
+             << "relevance = "s << relevance << " }"s << endl;
     }
 }
