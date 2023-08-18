@@ -141,6 +141,21 @@ private:
     }
 };
 
+SearchServer CreateSearchServer() {
+    SearchServer search_server;
+    search_server.SetStopWords(ReadLine());
+
+    const int document_count = ReadLineWithNumber();
+    for (int document_id = 0; document_id < document_count; ++document_id) {
+        search_server.AddDocument(document_id, ReadLine());
+    }
+
+    return search_server;
+}
+
+int main() {
+    SearchServer search_server = CreateSearchServer();
+}
 
 /*
 int main() {
