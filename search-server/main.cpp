@@ -134,6 +134,12 @@ public:
         const vector<string> words = SplitIntoWordsNoStop(document);
         documents_.push_back({document_id, words});
     }
+    
+    void SetStopWords(const string& text) {
+        for (const string& word : SplitIntoWords(text)) {
+            stop_words_.insert(word);
+        }
+    }
 private:
     struct DocumentContent {
         int id = 0;
