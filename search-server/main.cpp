@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -56,11 +57,12 @@ public:
     }
 
     void AddDocument(int document_id, const string& document) {
-        const vector<string> words = SplitIntoWordsNoStop(document);
-        documents_.push_back({document_id, words});
+        for (const string& word : SplitIntoWordsNoStop(document)) {
+            word_to_documents_[word].insert(document_id);
+        }
     }
 
-    vector<Document> FindTopDocuments(const string& raw_query) const {
+    vector<Document> FindTopDocuments(const string& raw_query) {
         const Query query = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query);
 
@@ -75,11 +77,6 @@ public:
     }
 
 private:
-    struct DocumentContent {
-        int id = 0;
-        vector<string> words;
-    };
-
     struct QueryWord {
         string data;
         bool is_minus;
@@ -91,7 +88,7 @@ private:
         set<string> minus_words;
     };
 
-    vector<DocumentContent> documents_;
+    map<string, set<int>> word_to_documents_;
 
     set<string> stop_words_;
 
@@ -134,34 +131,29 @@ private:
         return query;
     }
 
-    vector<Document> FindAllDocuments(const Query& query) const {
+    vector<Document> FindAllDocuments(const Query& query) {
+        map<int, int> document_to_relevance;
         vector<Document> matched_documents;
-        for (const auto& document : documents_) {
-            const int relevance = MatchDocument(document, query);
-            if (relevance > 0) {
-                matched_documents.push_back({document.id, relevance});
+        for (const string& plus_word : query.plus_words) {
+            if (word_to_documents_.count(plus_word)) {
+                for (const int& id_document : word_to_documents_[plus_word]) {
+                    ++document_to_relevance[id_document];
+                }
             }
+        }
+        for (const string& minus_word: query.minus_words) {
+            if (word_to_documents_.count(minus_word)) {
+                for (const int& id_document : word_to_documents_[minus_word]) {
+                    document_to_relevance.erase(id_document);
+                }
+            }
+        }
+
+        for (const auto& [id_document, relevance]: document_to_relevance) {
+            matched_documents.push_back({id_document, relevance});
         }
         return matched_documents;
-    }
 
-    static int MatchDocument(const DocumentContent& content, const Query& query) {
-        if (query.plus_words.empty()) {
-            return 0;
-        }
-        set<string> matched_words;
-        for (const string& word : content.words) {
-            if (query.minus_words.count(word) != 0) {
-                return 0;
-            }
-            if (matched_words.count(word) != 0) {
-                continue;
-            }
-            if (query.plus_words.count(word) != 0) {
-                matched_words.insert(word);
-            }
-        }
-        return static_cast<int>(matched_words.size());
     }
 };
 
@@ -178,7 +170,7 @@ SearchServer CreateSearchServer() {
 }
 
 int main() {
-    const SearchServer search_server = CreateSearchServer();
+    SearchServer search_server = CreateSearchServer();
 
     const string query = ReadLine();
     for (const auto& [document_id, relevance] : search_server.FindTopDocuments(query)) {
