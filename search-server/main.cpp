@@ -46,7 +46,7 @@ vector<string> SplitIntoWords(const string& text) {
 
 struct Document {
     int id;
-    int relevance;
+    double relevance;
 };
 
 class SearchServer {
