@@ -62,7 +62,7 @@ public:
         }
     }
 
-    vector<Document> FindTopDocuments(const string& raw_query) {
+    vector<Document> FindTopDocuments(const string& raw_query) const {
         const Query query = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query);
 
@@ -131,19 +131,19 @@ private:
         return query;
     }
 
-    vector<Document> FindAllDocuments(const Query& query) {
+    vector<Document> FindAllDocuments(const Query& query) const {
         map<int, int> document_to_relevance;
         vector<Document> matched_documents;
         for (const string& plus_word : query.plus_words) {
             if (word_to_documents_.count(plus_word)) {
-                for (const int& id_document : word_to_documents_[plus_word]) {
+                for (const int& id_document : word_to_documents_.at(plus_word)) {
                     ++document_to_relevance[id_document];
                 }
             }
         }
         for (const string& minus_word: query.minus_words) {
             if (word_to_documents_.count(minus_word)) {
-                for (const int& id_document : word_to_documents_[minus_word]) {
+                for (const int& id_document : word_to_documents_.at(minus_word)) {
                     document_to_relevance.erase(id_document);
                 }
             }
@@ -170,7 +170,7 @@ SearchServer CreateSearchServer() {
 }
 
 int main() {
-    SearchServer search_server = CreateSearchServer();
+    const SearchServer search_server = CreateSearchServer();
 
     const string query = ReadLine();
     for (const auto& [document_id, relevance] : search_server.FindTopDocuments(query)) {
