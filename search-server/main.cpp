@@ -1,10 +1,11 @@
 #include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <map>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
 
 using namespace std;
 
@@ -56,10 +57,14 @@ public:
         }
     }
 
+
     void AddDocument(int document_id, const string& document) {
-        for (const string& word : SplitIntoWordsNoStop(document)) {
-            word_to_documents_[word].insert(document_id);
+        vector<string> doc_words = SplitIntoWordsNoStop(document);
+        const double tf_once = 1.0 / doc_words.size();
+        for (const string& word : doc_words) {
+             word_to_document_freqs_[word][document_id] += tf_once;
         }
+        ++document_count_;
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
@@ -88,8 +93,8 @@ private:
         set<string> minus_words;
     };
 
-    map<string, set<int>> word_to_documents_;
-
+    int document_count_ = 0;
+    map<string, map<int, double>> word_to_document_freqs_;
     set<string> stop_words_;
 
     bool IsStopWord(const string& word) const {
@@ -131,29 +136,39 @@ private:
         return query;
     }
 
+    double CalculateTFWord(const string& word) const {
+        return log(document_count_ * 1.0 / word_to_document_freqs_.at(word).size());
+    }
+
     vector<Document> FindAllDocuments(const Query& query) const {
-        map<int, int> document_to_relevance;
+        map<int, double> document_to_relevance;
         vector<Document> matched_documents;
+         
+        // Plus words
         for (const string& plus_word : query.plus_words) {
-            if (word_to_documents_.count(plus_word)) {
-                for (const int& id_document : word_to_documents_.at(plus_word)) {
-                    ++document_to_relevance[id_document];
-                }
+            if (!word_to_document_freqs_.count(plus_word)) {
+                continue;
+            }
+            const double idf = CalculateTFWord(plus_word);
+            for (const auto& [document_id, tf] : word_to_document_freqs_.at(plus_word)) {
+                document_to_relevance[document_id] += tf * idf;
             }
         }
+
+        // Minus words
         for (const string& minus_word: query.minus_words) {
-            if (word_to_documents_.count(minus_word)) {
-                for (const int& id_document : word_to_documents_.at(minus_word)) {
-                    document_to_relevance.erase(id_document);
+            if (word_to_document_freqs_.count(minus_word)) {
+                for (const auto& [document_id, tf] : word_to_document_freqs_.at(minus_word)) {
+                    document_to_relevance.erase(document_id);
                 }
             }
         }
 
-        for (const auto& [id_document, relevance]: document_to_relevance) {
-            matched_documents.push_back({id_document, relevance});
+        // Update matched_documents
+        for (const auto& [document_id, relevance]: document_to_relevance) {
+            matched_documents.push_back({document_id, relevance});
         }
         return matched_documents;
-
     }
 };
 
