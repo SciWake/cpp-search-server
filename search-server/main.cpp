@@ -84,6 +84,8 @@ private:
 
     set<string> stop_words_;
 
+    set<string> minus_words_;
+
     bool IsStopWord(const string& word) const {
         return stop_words_.count(word) > 0;
     }
@@ -102,6 +104,10 @@ private:
         set<string> query_words;
         for (const string& word : SplitIntoWordsNoStop(text)) {
             query_words.insert(word);
+            if (word[0] == '-') {
+                // minus_words_.insert(word.substr(1));
+                query_words.insert(word);
+            }
         }
         return query_words;
     }
