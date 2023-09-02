@@ -40,7 +40,6 @@ vector<string> SplitIntoWords(const string& text) {
     if (!word.empty()) {
         words.push_back(word);
     }
-
     return words;
 }
 
@@ -56,7 +55,6 @@ public:
             stop_words_.insert(word);
         }
     }
-
 
     void AddDocument(int document_id, const string& document) {
         vector<string> doc_words = SplitIntoWordsNoStop(document);
