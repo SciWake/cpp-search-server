@@ -84,7 +84,12 @@ public:
         
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
-                 return lhs.relevance > rhs.relevance;
+                const double EPSILON = 1e-6;                
+                if (std::abs(lhs.relevance - rhs.relevance) < EPSILON) {
+                    return lhs.rating > rhs.rating;
+                } else {
+                    return lhs.relevance > rhs.relevance; 
+                }
              });
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
