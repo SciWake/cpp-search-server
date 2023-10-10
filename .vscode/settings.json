@@ -1,14 +1,21 @@
 {
     "files.associations": {
-        "iostream": "cpp",
-        "vector": "cpp",
-        "deque": "cpp",
-        "string": "cpp",
-        "*.tcc": "cpp",
-        "array": "cpp",
-        "string_view": "cpp",
-        "initializer_list": "cpp",
-        "utility": "cpp"
+      "iostream": "cpp",
+      "vector": "cpp",
+      "deque": "cpp",
+      "string": "cpp",
+      "*.tcc": "cpp",
+      "array": "cpp",
+      "string_view": "cpp",
+      "initializer_list": "cpp",
+      "utility": "cpp",
+      "numeric": "cpp",
+      "unordered_map": "cpp",
+      "tuple": "cpp",
+      "map": "cpp",
+      "ostream": "cpp",
+      "cmath": "cpp",
+      "iosfwd": "cpp"
     },
     "editor.rulers": [
         {
