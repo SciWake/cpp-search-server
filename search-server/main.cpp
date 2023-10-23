@@ -1,6 +1,3 @@
-//Урок 6. Обработка ошибок в поисковой системе.
-/* Решение из урока №3 (на основе optional) */
-//Урок 3: Применяем класс optional
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -187,7 +184,7 @@ public:
     }
     
 private:
-      struct QueryWord {
+    struct QueryWord {
         string data;
         bool is_minus;
         bool is_stop;
@@ -218,13 +215,13 @@ private:
     }
          
     vector<string> SplitIntoWordsNoStop(const string& text) const {
-            vector<string> words;
-            for (const string& word : SplitIntoWords(text)) {
-                if (!IsStopWord(word)) {
-                    words.push_back(word);
-                }
+        vector<string> words;
+        for (const string& word : SplitIntoWords(text)) {
+            if (!IsStopWord(word)) {
+                words.push_back(word);
             }
-            return words;
+        }
+        return words;
     }
  
     static int ComputeAverageRating(const vector<int>& ratings) {
@@ -268,7 +265,6 @@ private:
 
     Query ParseQuery(const string& text) const {
         Query result;
-
         for (const string& word : SplitIntoWords(text)) {
             QueryWord query_word = ParseQueryWord(word);
             if (!query_word.is_stop) {
@@ -323,7 +319,6 @@ private:
  
 
 // ==================== для примера =========================
- 
 void PrintDocument(const Document& document) {
     cout << "{ "
          << "document_id = " << document.id << ", "
