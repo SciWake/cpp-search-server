@@ -213,6 +213,7 @@ private:
     }
     
     static bool IsValidWord(const string& word) {
+        // A valid word must not contain special characters
         return none_of(word.begin(), word.end(), [](char c) {
             return c >= '\0' && c < ' ';
         });
@@ -242,38 +243,32 @@ private:
         return rating_sum / static_cast<int>(ratings.size());
     }
  
-    QueryWord ParseQueryWord(string text) const {
-        QueryWord result;
-
+    QueryWord ParseQueryWord(const string& text) const {
         if (text.empty()) {
-            throw invalid_argument("Пустая строка"s);
+            throw invalid_argument("Query word is empty"s);
         }
-
+        string word = text;
         bool is_minus = false;
-        if (text[0] == '-') {
+        if (word[0] == '-') {
             is_minus = true;
-            text = text.substr(1);
+            word = word.substr(1);
+        }
+        if (word.empty() || word[0] == '-' || !IsValidWord(word)) {
+            throw invalid_argument("Query word "s + text + " is invalid");
         }
 
-        if (text.empty()) {
-            throw invalid_argument("Пробел или отсутствие текста после знака \"-\""s);
-        } else if (text[0] == '-') {
-            throw invalid_argument("Двойной знак \"-\" в минус-слове"s);
-        } else if (!IsValidWord(text)) {
-            throw invalid_argument("Слово содержит специальные символы"s);
-        }
-
-        result.data = text;
-        result.is_minus = is_minus;
-        result.is_stop = IsStopWord(text);
-
-        return result;
+        return {word, is_minus, IsStopWord(word)};
     }
+
+    struct Query {
+        set<string> plus_words;
+        set<string> minus_words;
+    };
 
     Query ParseQuery(const string& text) const {
         Query result;
         for (const string& word : SplitIntoWords(text)) {
-            QueryWord query_word = ParseQueryWord(word);
+            const auto query_word = ParseQueryWord(word);
             if (!query_word.is_stop) {
                 if (query_word.is_minus) {
                     result.minus_words.insert(query_word.data);
