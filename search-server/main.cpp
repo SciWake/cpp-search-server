@@ -372,6 +372,14 @@ void MatchDocuments(const SearchServer& search_server, const string& query) {
 }
 
 template <typename Iterator>
+ostream& operator<<(ostream& out, const IteratorRange<Iterator>& range) {
+    for (Iterator it = range.begin(); it != range.end(); ++it) {
+        out << *it;
+    }
+    return out;
+}
+
+template <typename Iterator>
 class IteratorRange {
 public:
     IteratorRange(Iterator begin, Iterator end)
