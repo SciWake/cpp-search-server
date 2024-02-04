@@ -104,23 +104,17 @@ public:
     }
 
     void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
-        if (document_id < 0) {
-            throw invalid_argument("индекс документа отрицательный"s);
+        if ((document_id < 0) || (documents_.count(document_id) > 0)) {
+            throw invalid_argument("Invalid document_id"s);
         }
-        if (documents_.count(document_id)) {
-            throw invalid_argument("документ c индексом ранее добавленного документа"s);
-        }
-        if (!IsValidWord(document)) {
-            throw invalid_argument("наличие недопустимых символов"s);
-        }
+        const auto words = SplitIntoWordsNoStop(document);
 
-        const vector<string> words = SplitIntoWordsNoStop(document);
-        for (auto& word : words) {
-            word_to_document_freqs_[word][document_id] += 1.0 / words.size();
+        const double inv_word_count = 1.0 / words.size();
+        for (const string& word : words) {
+            word_to_document_freqs_[word][document_id] += inv_word_count;
         }
-        documents_.emplace(document_id, DocumentData { ComputeAverageRating(ratings), status });
-
-        documents_index_.push_back(document_id);
+        documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
+        document_ids_.push_back(document_id);
     }
  
     template <typename DocumentPredicate>
