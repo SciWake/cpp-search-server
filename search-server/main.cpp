@@ -89,18 +89,20 @@ enum class DocumentStatus {
  
 class SearchServer {
 public:
-    inline static constexpr int INVALID_DOCUMENT_ID = -1;
-    SearchServer() = default;
-    
-   template <typename StringContainer>
-   explicit SearchServer(const StringContainer& stop_words) 
-        :stop_words_ (MakeUniqueNonEmptyStrings(stop_words)){
-        if (all_of(stop_words.begin(), stop_words.end(), IsValidWord)) {}
-        else {
-            throw invalid_argument("наличие недопустимых символов"s);
+    template <typename StringContainer>
+    explicit SearchServer(const StringContainer& stop_words)
+        : stop_words_(MakeUniqueNonEmptyStrings(stop_words))  // Extract non-empty stop words
+    {
+        if (!all_of(stop_words_.begin(), stop_words_.end(), IsValidWord)) {
+            throw invalid_argument("Some of stop words are invalid"s);
         }
     }
- 
+
+    explicit SearchServer(const string& stop_words_text)
+        : SearchServer(SplitIntoWords(stop_words_text))  // Invoke delegating constructor from string container
+    {
+    }
+
     explicit SearchServer(const string& stop_words_text) :SearchServer(SplitIntoWords(stop_words_text)){}
 
     void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
