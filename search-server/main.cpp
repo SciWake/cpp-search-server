@@ -320,60 +320,54 @@ private:
 
 // ==================== для примера =========================
 void PrintDocument(const Document& document) {
-    cout << "{ "
-         << "document_id = " << document.id << ", "
-         << "relevance = " << document.relevance << ", "
-         << "rating = " << document.rating << " }" << endl;
+    cout << "{ "s
+         << "document_id = "s << document.id << ", "s
+         << "relevance = "s << document.relevance << ", "s
+         << "rating = "s << document.rating << " }"s << endl;
 }
 
 void PrintMatchDocumentResult(int document_id, const vector<string>& words, DocumentStatus status) {
-    cout << "{ "
-        << "document_id = " << document_id << ", "
-        << "status = " << static_cast<int>(status) << ", "
-        << "words =";
+    cout << "{ "s
+         << "document_id = "s << document_id << ", "s
+         << "status = "s << static_cast<int>(status) << ", "s
+         << "words ="s;
     for (const string& word : words) {
         cout << ' ' << word;
     }
-    cout << "}" << endl;
+    cout << "}"s << endl;
 }
 
-void AddDocument(SearchServer& search_server, 
-                 int document_id, 
-                 const string& document, 
-                 DocumentStatus status, 
+void AddDocument(SearchServer& search_server, int document_id, const string& document, DocumentStatus status,
                  const vector<int>& ratings) {
     try {
         search_server.AddDocument(document_id, document, status, ratings);
-    }
-    catch (const invalid_argument& e) {
+    } catch (const invalid_argument& e) {
         cout << "Ошибка добавления документа "s << document_id << ": "s << e.what() << endl;
     }
 }
- 
+
 void FindTopDocuments(const SearchServer& search_server, const string& raw_query) {
-    cout << "Результат поиска по запросу: "s << raw_query << endl;
+    cout << "Результаты поиска по запросу: "s << raw_query << endl;
     try {
         for (const Document& document : search_server.FindTopDocuments(raw_query)) {
             PrintDocument(document);
         }
-    }
-    catch (const invalid_argument& e) {
+    } catch (const invalid_argument& e) {
         cout << "Ошибка поиска: "s << e.what() << endl;
     }
 }
- 
+
 void MatchDocuments(const SearchServer& search_server, const string& query) {
     try {
-        cout << "Совпадение документов по запросу: "s << query << endl;
+        cout << "Матчинг документов по запросу: "s << query << endl;
         const int document_count = search_server.GetDocumentCount();
         for (int index = 0; index < document_count; ++index) {
             const int document_id = search_server.GetDocumentId(index);
             const auto [words, status] = search_server.MatchDocument(query, document_id);
             PrintMatchDocumentResult(document_id, words, status);
         }
-    }
-    catch (const exception& e) {
-        cout << "Ошибка совпадения документов на запрос "s << query << ": "s << e.what() << endl;
+    } catch (const invalid_argument& e) {
+        cout << "Ошибка матчинга документов на запрос "s << query << ": "s << e.what() << endl;
     }
 }
 
