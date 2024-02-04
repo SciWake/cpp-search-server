@@ -46,7 +46,6 @@ vector<string> SplitIntoWords(const string& text) {
     }
     return words;
 }
- 
 
 struct Document {
     Document() = default;
@@ -61,6 +60,14 @@ struct Document {
     double relevance = 0.0;
     int rating = 0;
 };
+
+ostream& operator<<(ostream& out, const Document& document) {
+    out << "{ "s
+        << "document_id = "s << document.id << ", "s
+        << "relevance = "s << document.relevance << ", "s
+        << "rating = "s << document.rating << " }"s;
+    return out;
+}
  
 template <typename StringContainer>
 set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
