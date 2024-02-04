@@ -316,7 +316,7 @@ private:
         return matched_documents;
     }
 };
- 
+
 
 // ==================== для примера =========================
 void PrintDocument(const Document& document) {
@@ -372,6 +372,32 @@ void MatchDocuments(const SearchServer& search_server, const string& query) {
 }
 
 template <typename Iterator>
+class IteratorRange {
+public:
+    IteratorRange(Iterator begin, Iterator end)
+        : first_(begin)
+        , last_(end)
+        , size_(distance(first_, last_)) {
+    }
+
+    Iterator begin() const {
+        return first_;
+    }
+
+    Iterator end() const {
+        return last_;
+    }
+
+    size_t size() const {
+        return size_;
+    }
+
+private:
+    Iterator first_, last_;
+    size_t size_;
+};
+
+template <typename Iterator>
 ostream& operator<<(ostream& out, const IteratorRange<Iterator>& range) {
     for (Iterator it = range.begin(); it != range.end(); ++it) {
         out << *it;
@@ -409,31 +435,10 @@ private:
     vector<IteratorRange<Iterator>> pages_;
 };
 
-template <typename Iterator>
-class IteratorRange {
-public:
-    IteratorRange(Iterator begin, Iterator end)
-        : first_(begin)
-        , last_(end)
-        , size_(distance(first_, last_)) {
-    }
-
-    Iterator begin() const {
-        return first_;
-    }
-
-    Iterator end() const {
-        return last_;
-    }
-
-    size_t size() const {
-        return size_;
-    }
-
-private:
-    Iterator first_, last_;
-    size_t size_;
-};
+template <typename Container>
+auto Paginate(const Container& c, size_t page_size) {
+    return Paginator(begin(c), end(c), page_size);
+}
 
 int main() {
     SearchServer search_server("и в на"s);
