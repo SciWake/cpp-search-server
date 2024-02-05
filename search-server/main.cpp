@@ -1,33 +1,30 @@
 #include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <map>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
-#include <cmath>
-#include <cassert>
-#include <optional>
-#include <stdexcept>
- 
+
 using namespace std;
- 
+
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
- 
 
 string ReadLine() {
     string s;
     getline(cin, s);
     return s;
 }
- 
+
 int ReadLineWithNumber() {
     int result;
     cin >> result;
     ReadLine();
     return result;
 }
- 
+
 vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
     string word;
@@ -68,7 +65,7 @@ ostream& operator<<(ostream& out, const Document& document) {
         << "rating = "s << document.rating << " }"s;
     return out;
 }
- 
+
 template <typename StringContainer>
 set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
     set<string> non_empty_strings;
@@ -79,14 +76,14 @@ set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
     }
     return non_empty_strings;
 }
- 
+
 enum class DocumentStatus {
     ACTUAL,
     IRRELEVANT,
     BANNED,
     REMOVED,
 };
- 
+
 class SearchServer {
 public:
     template <typename StringContainer>
@@ -116,7 +113,7 @@ public:
         documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
         document_ids_.push_back(document_id);
     }
- 
+
     template <typename DocumentPredicate>
     vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
         const auto query = ParseQuery(raw_query);
@@ -154,7 +151,7 @@ public:
     int GetDocumentId(int index) const {
         return document_ids_.at(index);
     }
- 
+
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
         const auto query = ParseQuery(raw_query);
 
@@ -178,7 +175,7 @@ public:
         }
         return {matched_words, documents_.at(document_id).status};
     }
-    
+
 private:
     struct DocumentData {
         int rating;
