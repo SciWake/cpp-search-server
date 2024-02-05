@@ -150,21 +150,16 @@ public:
     }
 
     int GetDocumentCount() const {
-        return static_cast<int>(documents_.size());
+        return documents_.size();
     }
 
-       
     int GetDocumentId(int index) const {
-        if (index >= 0 && index < GetDocumentCount()) { 
-            return documents_index_.at(index);
-        } else { 
-            throw out_of_range("Индекс выходит за пределы диапазона"s); 
-        } 
+        return document_ids_.at(index);
     }
  
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
-        Query query = ParseQuery(raw_query);
- 
+        const auto query = ParseQuery(raw_query);
+
         vector<string> matched_words;
         for (const string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
@@ -183,8 +178,7 @@ public:
                 break;
             }
         }
- 
-        return { matched_words, documents_.at(document_id).status };
+        return {matched_words, documents_.at(document_id).status};
     }
     
 private:
