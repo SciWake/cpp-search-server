@@ -242,7 +242,13 @@ private:
         }
         return rating_sum / static_cast<int>(ratings.size());
     }
- 
+
+    struct QueryWord {
+        string data;
+        bool is_minus;
+        bool is_stop;
+    };
+
     QueryWord ParseQueryWord(const string& text) const {
         if (text.empty()) {
             throw invalid_argument("Query word is empty"s);
@@ -280,13 +286,14 @@ private:
         return result;
     }
 
+    // Existence required
     double ComputeWordInverseDocumentFreq(const string& word) const {
         return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
     }
+
  
     template <typename DocumentPredicate>
-    vector<Document> FindAllDocuments(const Query& query,
-                                      DocumentPredicate document_predicate) const {
+    vector<Document> FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const {
         map<int, double> document_to_relevance;
         for (const string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
@@ -300,7 +307,7 @@ private:
                 }
             }
         }
- 
+
         for (const string& word : query.minus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
                 continue;
@@ -309,11 +316,10 @@ private:
                 document_to_relevance.erase(document_id);
             }
         }
- 
+
         vector<Document> matched_documents;
         for (const auto [document_id, relevance] : document_to_relevance) {
-            matched_documents.push_back(
-                {document_id, relevance, documents_.at(document_id).rating});
+            matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
         }
         return matched_documents;
     }
