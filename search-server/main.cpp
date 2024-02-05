@@ -188,37 +188,26 @@ public:
     }
     
 private:
-    struct QueryWord {
-        string data;
-        bool is_minus;
-        bool is_stop;
-    };
- 
     struct DocumentData {
         int rating;
         DocumentStatus status;
     };
-    struct Query {
-        set<string> plus_words;
-        set<string> minus_words;
-    };
-    
     const set<string> stop_words_;
     map<string, map<int, double>> word_to_document_freqs_;
     map<int, DocumentData> documents_;
-    vector<int> documents_index_;
- 
+    vector<int> document_ids_;
+
     bool IsStopWord(const string& word) const {
         return stop_words_.count(word) > 0;
     }
-    
+
     static bool IsValidWord(const string& word) {
         // A valid word must not contain special characters
         return none_of(word.begin(), word.end(), [](char c) {
             return c >= '\0' && c < ' ';
         });
     }
-         
+
     vector<string> SplitIntoWordsNoStop(const string& text) const {
         vector<string> words;
         for (const string& word : SplitIntoWords(text)) {
@@ -231,7 +220,7 @@ private:
         }
         return words;
     }
- 
+
     static int ComputeAverageRating(const vector<int>& ratings) {
         if (ratings.empty()) {
             return 0;
@@ -291,7 +280,6 @@ private:
         return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
     }
 
- 
     template <typename DocumentPredicate>
     vector<Document> FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const {
         map<int, double> document_to_relevance;
