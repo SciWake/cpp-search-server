@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <deque>
 #include <iostream>
 #include <map>
 #include <set>
@@ -446,11 +447,18 @@ public:
     }
 private:
     struct QueryResult {
-        // определите, что должно быть в структуре
+        uint64_t timestamp;
+        int result;
     };
     deque<QueryResult> requests_;
+    const SearchServer& search_server_;
+    int no_results_requests_;
+    uint64_t current_time_;
     const static int min_in_day_ = 1440;
-    // возможно, здесь вам понадобится что-то ещё
+
+    void AddRequest(int results_num) {
+
+    }
 };
 
 
