@@ -428,22 +428,28 @@ auto Paginate(const Container& c, size_t page_size) {
 
 class RequestQueue {
 public:
-    explicit RequestQueue(const SearchServer& search_server) {
-        // напишите реализацию
+    explicit RequestQueue(const SearchServer& search_server)
+        : search_server_(search_server), no_results_requests_(0), current_time_(0) {
     }
-    // сделаем "обёртки" для всех методов поиска, чтобы сохранять результаты для нашей статистики
+    // сделаем "обертки" для всех методов поиска, чтобы сохранять результаты для нашей статистики
     template <typename DocumentPredicate>
     vector<Document> AddFindRequest(const string& raw_query, DocumentPredicate document_predicate) {
-        // напишите реализацию
+        const auto result = search_server_.FindTopDocuments(raw_query, document_predicate);
+        AddRequest(result.size());
+        return result;
     }
     vector<Document> AddFindRequest(const string& raw_query, DocumentStatus status) {
-        // напишите реализацию
+        const auto result = search_server_.FindTopDocuments(raw_query, status);
+        AddRequest(result.size());
+        return result;
     }
     vector<Document> AddFindRequest(const string& raw_query) {
-        // напишите реализацию
+        const auto result = search_server_.FindTopDocuments(raw_query);
+        AddRequest(result.size());
+        return result;
     }
     int GetNoResultRequests() const {
-        // напишите реализацию
+        return no_results_requests_;
     }
 private:
     struct QueryResult {
@@ -461,7 +467,7 @@ private:
         ++current_time_;
         // удаляем все результаты поиска, которые устарели
         while (!requests_.empty() && min_in_day_ <= current_time_ - requests_.front().timestamp) {
-            if (0 == requests_.front().results) {
+            if (0 == requests_.front().result) {
                 --no_results_requests_;
             }
             requests_.pop_front();
