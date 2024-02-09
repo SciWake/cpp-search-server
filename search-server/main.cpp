@@ -105,8 +105,8 @@ public:
         if ((document_id < 0) || (documents_.count(document_id) > 0)) {
             throw invalid_argument("Invalid document_id"s);
         }
-        const auto words = SplitIntoWordsNoStop(document);
 
+        const auto words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
         for (const string& word : words) {
             word_to_document_freqs_[word][document_id] += inv_word_count;
@@ -116,17 +116,15 @@ public:
     }
 
     template <typename DocumentPredicate>
-    vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
+    vector<Document> FindTopDocuments(const string& raw_query, 
+                                      DocumentPredicate document_predicate) const {
         const auto query = ParseQuery(raw_query);
-
         auto matched_documents = FindAllDocuments(query, document_predicate);
 
-        sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
-            if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
-                return lhs.rating > rhs.rating;
-            } else {
-                return lhs.relevance > rhs.relevance;
-            }
+        sort(matched_documents.begin(), matched_documents.end(), 
+            [](const Document& lhs, const Document& rhs) {
+                return lhs.relevance > rhs.relevance 
+                       || (abs(lhs.relevance - rhs.relevance) < 1e-6 && lhs.rating > rhs.rating);
         });
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
