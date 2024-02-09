@@ -129,7 +129,6 @@ public:
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
-
         return matched_documents;
     }
 
@@ -239,7 +238,6 @@ private:
         if (word.empty() || word[0] == '-' || !IsValidWord(word)) {
             throw invalid_argument("Query word "s + text + " is invalid");
         }
-
         return {word, is_minus, IsStopWord(word)};
     }
 
@@ -427,7 +425,9 @@ auto Paginate(const Container& c, size_t page_size) {
 class RequestQueue {
 public:
     explicit RequestQueue(const SearchServer& search_server)
-        : search_server_(search_server), no_results_requests_(0), current_time_(0) {
+        : search_server_(search_server)
+        , no_results_requests_(0)
+        , current_time_(0) {
     }
     // сделаем "обертки" для всех методов поиска, чтобы сохранять результаты для нашей статистики
     template <typename DocumentPredicate>
@@ -436,19 +436,23 @@ public:
         AddRequest(result.size());
         return result;
     }
+
     vector<Document> AddFindRequest(const string& raw_query, DocumentStatus status) {
         const auto result = search_server_.FindTopDocuments(raw_query, status);
         AddRequest(result.size());
         return result;
     }
+
     vector<Document> AddFindRequest(const string& raw_query) {
         const auto result = search_server_.FindTopDocuments(raw_query);
         AddRequest(result.size());
         return result;
     }
+
     int GetNoResultRequests() const {
         return no_results_requests_;
     }
+
 private:
     struct QueryResult {
         uint64_t timestamp;
@@ -483,11 +487,13 @@ private:
 int main() {
     SearchServer search_server("and in at"s);
     RequestQueue request_queue(search_server);
+
     search_server.AddDocument(1, "curly cat curly tail"s, DocumentStatus::ACTUAL, {7, 2, 7});
     search_server.AddDocument(2, "curly dog and fancy collar"s, DocumentStatus::ACTUAL, {1, 2, 3});
     search_server.AddDocument(3, "big cat fancy collar "s, DocumentStatus::ACTUAL, {1, 2, 8});
     search_server.AddDocument(4, "big dog sparrow Eugene"s, DocumentStatus::ACTUAL, {1, 3, 2});
     search_server.AddDocument(5, "big dog sparrow Vasiliy"s, DocumentStatus::ACTUAL, {1, 1, 1});
+    
     // 1439 запросов с нулевым результатом
     for (int i = 0; i < 1439; ++i) {
         request_queue.AddFindRequest("empty request"s);
@@ -499,5 +505,4 @@ int main() {
     // первый запрос удален, 1437 запросов с нулевым результатом
     request_queue.AddFindRequest("sparrow"s);
     cout << "Total empty requests: "s << request_queue.GetNoResultRequests() << endl;
-    return 0;
 }
