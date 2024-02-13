@@ -13,24 +13,6 @@
 #include "string_processing.h"
 #include "search_server.h"
 
-using namespace std;
-
-
-string ReadLine() {
-    string s;
-    getline(cin, s);
-    return s;
-}
-
-int ReadLineWithNumber() {
-    int result;
-    cin >> result;
-    ReadLine();
-    return result;
-}
-
-
-
 
 // ==================== для примера =========================
 int main() {
