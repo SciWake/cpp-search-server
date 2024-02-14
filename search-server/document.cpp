@@ -1,8 +1,9 @@
-#include <iostream>
+#include <stdexcept>
 
 #include "document.h"
 
 using namespace std::literals;
+
 
 struct Document {
     Document() = default;
@@ -57,7 +58,7 @@ void AddDocument(SearchServer& search_server,
                  const std::vector<int>& ratings) {
     try {
         search_server.AddDocument(document_id, document, status, ratings);
-    } catch (const invalid_argument& e) {
+    } catch (const std::invalid_argument& e) {
         std::cout << "Ошибка добавления документа "s << document_id << ": "s << e.what() << std::endl;
     }
 }
@@ -68,7 +69,7 @@ void FindTopDocuments(const SearchServer& search_server, const std::string& raw_
         for (const Document& document : search_server.FindTopDocuments(raw_query)) {
             PrintDocument(document);
         }
-    } catch (const invalid_argument& e) {
+    } catch (const std::invalid_argument& e) {
         std::cout << "Ошибка поиска: "s << e.what() << std::endl;
     }
 }
@@ -82,7 +83,7 @@ void MatchDocuments(const SearchServer& search_server, const std::string& query)
             const auto [words, status] = search_server.MatchDocument(query, document_id);
             PrintMatchDocumentResult(document_id, words, status);
         }
-    } catch (const invalid_argument& e) {
+    } catch (const std::invalid_argument& e) {
         std::cout << "Ошибка матчинга документов на запрос "s << query << ": "s << e.what() << std::endl;
     }
 }
