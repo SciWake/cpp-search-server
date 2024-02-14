@@ -1,6 +1,8 @@
 #pragma once
 
 #include <fstream>
+#include <vector>
+// #include "search_server.h"
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 struct Document {
@@ -18,8 +20,8 @@ enum class DocumentStatus {
     REMOVED,
 };
 std::ostream& operator<<(std::ostream& out, const Document& document);
-// void PrintDocument(const Document& document);
-// void PrintMatchDocumentResult(int document_id, const std::vector<std::string>& words, DocumentStatus status);
+void PrintDocument(const Document& document); // Unused
+void PrintMatchDocumentResult(int document_id, const std::vector<std::string>& words, DocumentStatus status); // Unused
 // void AddDocument(SearchServer& search_server, 
 //                  int document_id, 
 //                  const std::string& document, 
