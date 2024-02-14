@@ -1,5 +1,4 @@
 #include "request_queue.h"
-#include "search-server"
 
 // public
 RequestQueue::RequestQueue(const SearchServer& search_server)

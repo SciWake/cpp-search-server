@@ -1,18 +1,21 @@
+#include <algorithm>
+#include <cmath>
 #include <deque>
 #include <iostream>
 #include <map>
 #include <set>
 #include <stdexcept>
 #include <string>
-#include <utility>
+// #include <utility>
 #include <vector>
 
-#include "document.h"
-#include "paginator.h"
-#include "request_queue.h"
-#include "string_processing.h"
-#include "search_server.h"
 
+// #include "document.h"
+// #include "search_server.h"
+#include "string_processing.h"
+#include "request_queue.h"
+
+using namespace std;
 
 // ==================== для примера =========================
 int main() {
@@ -35,5 +38,5 @@ int main() {
     request_queue.AddFindRequest("big collar"s);
     // первый запрос удален, 1437 запросов с нулевым результатом
     request_queue.AddFindRequest("sparrow"s);
-    cout << "Total empty requests: "s << request_queue.GetNoResultRequests() << endl;
+    std::cout << "Total empty requests: "s << request_queue.GetNoResultRequests() << std::endl;
 }

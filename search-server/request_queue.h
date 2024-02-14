@@ -1,7 +1,12 @@
 #pragma once
 
+#include <deque>
 #include <string>
 #include <vector>
+
+#include "search_server.h"
+#include "document.h"
+
 
 class RequestQueue {
 public:
@@ -18,7 +23,7 @@ private:
         uint64_t timestamp;
         int results;
     };
-    deque<QueryResult> requests_;
+    std::deque<QueryResult> requests_;
     const SearchServer& search_server_;
     int no_results_requests_;
     uint64_t current_time_;
