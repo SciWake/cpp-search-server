@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 struct Document {
     Document() = default;
@@ -15,7 +17,7 @@ enum class DocumentStatus {
     BANNED,
     REMOVED,
 };
-// std::ostream& operator<<(std::ostream& out, const Document& document);
+std::ostream& operator<<(std::ostream& out, const Document& document);
 // void PrintDocument(const Document& document);
 // void PrintMatchDocumentResult(int document_id, const std::vector<std::string>& words, DocumentStatus status);
 // void AddDocument(SearchServer& search_server, 
