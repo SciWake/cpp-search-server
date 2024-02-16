@@ -1,8 +1,10 @@
 #include "document.h"
-#include <string>
+
 #include <iostream>
+#include <string>
 
 using namespace std::string_literals;
+
 
 Document::Document(int id, double relevance, int rating)
     : id(id)

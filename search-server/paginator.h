@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iterator>
-#include <vector>
 #include <fstream> 
+#include <vector>
 
 
 template <typename Iterator>

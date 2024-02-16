@@ -1,18 +1,16 @@
 #pragma once
 
+#include "document.h"
+#include "string_processing.h"
+
 #include <algorithm>
 #include <cmath>
-#include <string>
-#include <vector>
-#include <tuple>
-#include <set>
 #include <map>
 #include <stdexcept>
-
-#include "string_processing.h"
-#include "document.h"
+#include <tuple>
 
 using namespace std::string_literals;
+
 
 class SearchServer {
 public:

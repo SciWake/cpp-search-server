@@ -1,22 +1,10 @@
-#include <algorithm>
-#include <cmath>
-#include <deque>
-#include <iostream>
-#include <map>
-#include <set>
-#include <stdexcept>
-#include <string>
-// #include <utility>
-#include <vector>
-
-
-// #include "document.h"
-// #include "search_server.h"
-// #include "string_processing.h"
-#include "request_queue.h"
 #include "paginator.h"
+#include "request_queue.h"
+
+#include <iostream>
 
 using namespace std;
+
 
 // ==================== для примера =========================
 int main() {
