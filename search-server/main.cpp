@@ -40,5 +40,4 @@ int main() {
         cout << *page << endl; 
         cout << "Разрыв страницы"s << endl;
     }
-
 }
