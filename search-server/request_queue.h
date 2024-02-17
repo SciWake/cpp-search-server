@@ -25,7 +25,6 @@ private:
     int no_results_requests_;
     uint64_t current_time_;
     const static int min_in_day_ = 1440;
-
     void AddRequest(int results_num);
 };
 

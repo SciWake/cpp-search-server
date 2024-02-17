@@ -119,3 +119,12 @@ std::vector<Document> SearchServer::FindAllDocuments(const SearchServer::Query& 
     }
     return matched_documents;
 }
+
+// Functions
+void AddDocument(SearchServer& search_server, // Unused
+                 int document_id, 
+                 const std::string& document, 
+                 DocumentStatus status,
+                 const std::vector<int>& ratings);
+void FindTopDocuments(const SearchServer& search_server, const std::string& raw_query); // Unused
+void MatchDocuments(const SearchServer& search_server, const std::string& query); // Unused

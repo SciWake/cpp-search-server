@@ -1,5 +1,7 @@
 #include "search_server.h"
 
+#include <iostream>
+
 
 // public
 SearchServer::SearchServer(const std::string& stop_words_text)
@@ -14,7 +16,7 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
     }
 
     const auto words = SplitIntoWordsNoStop(document);
-    const double inv_word_count = 1.0 / words.size();
+    const double inv_word_count = 1.0 / static_cast<int>(words.size());
     for (const std::string& word : words) {
         word_to_document_freqs_[word][document_id] += inv_word_count;
     }
@@ -33,7 +35,7 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_quer
 }
 
 int SearchServer::GetDocumentCount() const {
-    return documents_.size();
+    return static_cast<int>(documents_.size());
 }
 
 int SearchServer::GetDocumentId(int index) const {
@@ -135,5 +137,44 @@ SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
 
 // Existence required
 double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) const {
-    return std::log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
+    return std::log(GetDocumentCount() * 1.0 / static_cast<int>(word_to_document_freqs_.at(word).size()));
+}
+
+
+// Functions
+void AddDocument(SearchServer& search_server,  // Unused
+                 int document_id, 
+                 const std::string& document, 
+                 DocumentStatus status, 
+                 const std::vector<int>& ratings) {
+    try {
+        search_server.AddDocument(document_id, document, status, ratings);
+    } catch (const std::invalid_argument& e) {
+        std::cout << "Ошибка добавления документа "s << document_id << ": "s << e.what() << std::endl;
+    }
+}
+
+void FindTopDocuments(const SearchServer& search_server, const std::string& raw_query) { // Unused
+    std::cout << "Результаты поиска по запросу: "s << raw_query << std::endl;
+    try {
+        for (const Document& document : search_server.FindTopDocuments(raw_query)) {
+            PrintDocument(document);
+        }
+    } catch (const std::invalid_argument& e) {
+        std::cout << "Ошибка поиска: "s << e.what() << std::endl;
+    }
+}
+
+void MatchDocuments(const SearchServer& search_server, const std::string& query) { // Unused
+    try {
+        std::cout << "Матчинг документов по запросу: "s << query << std::endl;
+        const int document_count = search_server.GetDocumentCount();
+        for (int index = 0; index < document_count; ++index) {
+            const int document_id = search_server.GetDocumentId(index);
+            const auto [words, status] = search_server.MatchDocument(query, document_id);
+            PrintMatchDocumentResult(document_id, words, status);
+        }
+    } catch (const std::invalid_argument& e) {
+        std::cout << "Ошибка матчинга документов на запрос "s << query << ": "s << e.what() << std::endl;
+    }
 }
